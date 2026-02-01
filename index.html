@@ -1,18 +1,48 @@
-const SPREADSHEET_ID = "【スプレッドシートID】";
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>計算書</title>
+<style>
+body { font-family: sans-serif; padding: 20px; }
+input { margin: 5px; }
+</style>
+</head>
+<body>
 
-function doPost(e) {
-  const data = JSON.parse(e.postData.contents);
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+<h2>計算書</h2>
 
-  let sheetName = "";
-  if (data.type === "personality") sheetName = "personality";
-  if (data.type === "bond") sheetName = "bond";
+B: <input id="b" type="number"><br>
+O: <input id="o" type="number"><br>
+T: <input id="t" type="number"><br>
 
-  const sheet = ss.getSheetByName(sheetName);
-  sheet.appendRow([
-    new Date(),
-    data.value
-  ]);
+<button onclick="calc()">計算</button>
 
-  return ContentService.createTextOutput("ok");
+<p>S = <span id="s"></span></p>
+
+<script>
+const GAS_URL = "【ここにGASのURL】";
+
+function calc() {
+  const b = parseFloat(document.getElementById("b").value);
+  const o = parseFloat(document.getElementById("o").value);
+  const t = parseFloat(document.getElementById("t").value);
+
+  const s = b - o * t;
+  const result = s.toFixed(2);
+
+  document.getElementById("s").textContent = result;
+
+  fetch(GAS_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      type: "bond",
+      value: result
+    })
+  });
 }
+</script>
+
+</body>
+</html>
