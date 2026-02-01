@@ -1,0 +1,18 @@
+const SPREADSHEET_ID = "【スプレッドシートID】";
+
+function doPost(e) {
+  const data = JSON.parse(e.postData.contents);
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  let sheetName = "";
+  if (data.type === "personality") sheetName = "personality";
+  if (data.type === "bond") sheetName = "bond";
+
+  const sheet = ss.getSheetByName(sheetName);
+  sheet.appendRow([
+    new Date(),
+    data.value
+  ]);
+
+  return ContentService.createTextOutput("ok");
+}
