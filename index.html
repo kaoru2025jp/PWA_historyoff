@@ -2,50 +2,67 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>計算書</title>
+<title>計算結果送信</title>
 <style>
-body { font-family: sans-serif; padding: 20px; }
-input { margin: 5px; }
+  body {
+    font-family: sans-serif;
+    padding: 20px;
+  }
+  input {
+    font-size: 16px;
+    padding: 5px;
+    width: 200px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  button {
+    font-size: 16px;
+    padding: 8px 16px;
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
 
-<h2>計算書</h2>
+<h2>計算（B - O × T）</h2>
 
-B: <input id="b" type="number"><br>
-O: <input id="o" type="number"><br>
-T: <input id="t" type="number"><br>
+<input id="b" placeholder="B">
+<input id="o" placeholder="O">
+<input id="t" placeholder="T">
 
-<button onclick="calc()">計算</button>
-
-<p>S = <span id="s"></span></p>
+<button onclick="calcAndSend()">計算して送信</button>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwnpZbGlEzZg5xP4XKNxDcXHxFPM6ubUq7th12qeV7mSoqdHDA9O0k67KiWEQ6h6eSQ/exec";
+function calcAndSend() {
+  const B = Number(document.getElementById("b").value);
+  const O = Number(document.getElementById("o").value);
+  const T = Number(document.getElementById("t").value);
 
-function calc() {
-  const b = parseFloat(document.getElementById("b").value);
-  const o = parseFloat(document.getElementById("o").value);
-  const t = parseFloat(document.getElementById("t").value);
+  if (isNaN(B) || isNaN(O) || isNaN(T)) {
+    alert("すべて数値で入力してください");
+    return;
+  }
 
-  const s = b - o * t;
-  const result = s.toFixed(2);
+  // ① 計算
+  const S = B - O * T;
 
-  document.getElementById("s").textContent = result;
+  // ② 成功実績のある送信方式をそのまま使用
+  const GAS_URL =
+    "https://script.google.com/macros/s/AKfycbxY8D8lRBCGACJwM9vgBPZvcPt_IqF2POa0oNp0C-p67ZSrnBwKccdeVQgdGkSW-6K0/exec";
 
-  fetch(GAS_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    type: "personality", // or "bond"
-    value: number
-  })
-});
+  const script = document.createElement("script");
+  script.src =
+    GAS_URL +
+    "?numbers=" + encodeURIComponent(S) +
+    "&callback=handleResponse";
 
-  
+  document.body.appendChild(script);
+}
+
+function handleResponse(res) {
+  if (res.status === "ok") {
+    alert("計算結果を記録しました");
+  }
 }
 </script>
 
